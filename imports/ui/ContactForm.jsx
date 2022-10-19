@@ -9,7 +9,7 @@ const ContactForm = () => {
 
   const saveContact = () => {
     console.log({ name, email, imageUrl });
-    ContactCollection.insert({ name, email, imageUrl });
+    ContactCollection.insert({ name, email, imageUrl }); //api에서 받고, 데이터베이스에 insert
     setName(""); // 이건 왜넣는거지???
     setEmail(""); // 이건 왜넣는거지???
     setImageUrl(""); // 이건 왜넣는거지??? 아 빈값으로 전환
