@@ -1,21 +1,45 @@
 import React, { useState } from "react";
 import { ContactCollection } from "../api/ContactCollection";
 //api 몽고 db
+import { Meteor } from "meteor/meteor"; //메테오 매서드 import
+import { ErrorAlert } from "./components/ErrorAlert";
+import { SuccessAlert } from "./components/SuccessAlert";
 
 const ContactForm = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  const showError = ({ message }) => {
+    setError(message);
+    setTimeout(() => {
+      setError("");
+    }, 3000);
+  }; // 리팩토링 showError함수에 넣음 + success메세지는 예시로 남겨둠
 
   const saveContact = () => {
-    console.log({ name, email, imageUrl });
-    ContactCollection.insert({ name, email, imageUrl }); //api에서 받고, 데이터베이스에 insert
-    setName(""); // 이건 왜넣는거지???
-    setEmail(""); // 이건 왜넣는거지???
-    setImageUrl(""); // 이건 왜넣는거지??? 아 빈값으로 전환
+    // ContactCollection.insert({ name, email, imageUrl }); //api에서 받고, 데이터베이스에 insert
+    Meteor.call("contacts.insert", { name, email, imageUrl }, (error) => {
+      if (error) {
+        showError(); // 리팩토링 showError함수에 넣음
+      } else {
+        setName(""); // 이건 왜넣는거지???
+        setEmail(""); // 이건 왜넣는거지???
+        setImageUrl(""); // 이건 왜넣는거지??? 아 빈값으로 전환
+        setSuccess("Contact saved!!!");
+        setTimeout(() => {
+          setSuccess("");
+        }, 3000);
+      }
+    }); //자동말고 Meteor 매서드를 사용 (주의: 서버설정)
   };
   return (
     <form className="mt-6">
+      {error && <ErrorAlert message={error} />}
+      {success && <SuccessAlert message={success} />}
+
       <div className="grid grid-cols-6 gap-6">
         <div className="col-span-6 sm:col-span-6 lg:col-span-2">
           <label
